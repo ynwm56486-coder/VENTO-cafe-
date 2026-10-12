@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vento - Restaurant Menu & Guest Wi-Fi</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vento: {
+                            gold: '#D4AF37',
+                            dark: '#121212',
+                            card: '#1A1A1A',
+                            accent: '#C5A059',
+                            red: '#E53E3E'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF099 0%, #D4AF37 50%, #997A15 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-border {
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121212;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
+    </style>
+</head>
+<body class="pb-12 min-h-screen flex flex-col justify-between">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 glass-panel border-b gold-border px-4 py-3 shadow-2xl">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-vento-gold to-yellow-200 flex items-center justify-center text-vento-dark font-serif font-bold text-xl shadow-lg">
+                    V
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold font-serif gold-gradient-text tracking-wide leading-none">VENTO</h1>
+                    <p class="text-[10px] text-gray-400 tracking-widest uppercase mt-0.5">Café & Restaurant</p>
+                </div>
+            </div>
+
+            <!-- Header Action Buttons -->
+            <div class="flex items-center space-x-2">
+                <button onclick="scrollToSection('wifi-section')" class="px-3 py-1.5 rounded-full bg-vento-gold/10 border border-vento-gold/40 text-vento-gold text-xs font-semibold hover:bg-vento-gold hover:text-vento-dark transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-wifi"></i>
+                    <span class="hidden sm:inline">Guest</span> Wi-Fi
+                </button>
+                <button onclick="openAdminModal()" class="px-3 py-1.5 rounded-full bg-gray-800 border border-gray-700 text-gray-300 text-xs font-semibold hover:bg-gray-700 hover:text-white transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Admin</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-6xl mx-auto px-4 pt-6 flex-grow w-full">
+
+        <!-- Hero Welcome Banner -->
+        <div class="relative rounded-2xl overflow-hidden mb-8 border border-vento-gold/20 shadow-2xl">
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80" alt="Vento Restaurant Interior" class="w-full h-44 sm:h-64 object-cover filter brightness-50">
+            <div class="absolute inset-0 bg-gradient-to-t from-vento-dark via-vento-dark/60 to-transparent flex flex-col justify-end p-5 sm:p-8">
+                <span class="text-vento-gold text-xs font-semibold tracking-widest uppercase mb-1"><i class="fa-solid fa-utensils mr-1"></i> Welcome to Vento</span>
+                <h2 class="text-2xl sm:text-4xl font-serif font-bold text-white mb-2">Exquisite Dining & Refreshments</h2>
+                <p class="text-xs sm:text-sm text-gray-300 max-w-xl">Browse our digital menu below. Connect to our complimentary high-speed Wi-Fi while you enjoy your meal!</p>
+            </div>
+        </div>
+
+        <!-- Wi-Fi Card Section -->
+        <div id="wifi-section" class="glass-panel rounded-2xl p-5 mb-8 shadow-xl">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div class="w-12 h-12 rounded-xl bg-vento-gold/10 border border-vento-gold/30 flex items-center justify-center text-vento-gold text-2xl flex-shrink-0">
+                        <i class="fa-solid fa-wifi"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-serif text-lg font-bold text-white">Customer Wi-Fi Access</h3>
+                            <span class="px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 text-[10px] font-bold uppercase">Free High-Speed</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-0.5">Scan the QR code or click below to copy password</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto bg-black/40 p-3 rounded-xl border border-gray-800">
+                    <!-- QR Code Display -->
+                    <div id="qrcode" class="bg-white p-2 rounded-lg border border-gray-300 flex-shrink-0"></div>
+                    
+                    <div class="space-y-1.5 text-center sm:text-left w-full sm:w-auto">
+                        <div class="text-xs text-gray-400">Network Name (SSID):</div>
+                        <div id="wifi-ssid-display" class="font-mono text-xs font-bold text-white bg-gray-800 px-2.5 py-1 rounded border border-gray-700">Vento_Guest_WiFi</div>
+                        
+                        <div class="text-xs text-gray-400 pt-1">Password:</div>
+                        <div class="flex items-center justify-center sm:justify-start gap-2">
+                            <span id="wifi-pass-display" class="font-mono text-xs font-bold text-vento-gold bg-gray-800 px-2.5 py-1 rounded border border-gray-700">TastyBites2026</span>
+                            <button onclick="copyWifiPassword()" class="px-2.5 py-1 bg-vento-gold text-vento-dark text-xs font-bold rounded hover:bg-yellow-400 transition flex items-center gap-1">
+                                <i class="fa-regular fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Bar & Filters -->
+        <div class="space-y-4 mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h3 class="text-2xl font-serif font-bold text-white self-start sm:self-auto">Our Menu</h3>
+                
+                <!-- Search Input -->
+                <div class="relative w-full sm:w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input type="text" id="search-input" onkeyup="filterMenu()" placeholder="Search dish or ingredient..." class="w-full bg-vento-card border border-gray-800 rounded-full py-2 pl-9 pr-4 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-vento-gold transition">
+                </div>
+            </div>
+
+            <!-- Category Pills Navigation -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="category-pills">
+                <button onclick="selectCategory('all')" class="cat-pill active px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap bg-vento-gold text-vento-dark shadow-md transition">All Items</button>
+                <button onclick="selectCategory('starters')" class="cat-pill px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap bg-vento-card text-gray-300 hover:text-white border border-gray-800 transition">Starters & Appetizers</button>
+                <button onclick="selectCategory('mains')" class="cat-pill px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap bg-vento-card text-gray-300 hover:text-white border border-gray-800 transition">Main Courses</button>
+                <button onclick="selectCategory('specials')" class="cat-pill px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap bg-vento-card text-gray-300 hover:text-white border border-gray-800 transition">Chef Specials</button>
+                <button onclick="selectCategory('desserts')" class="cat-pill px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap bg-vento-card text-gray-300 hover:text-white border border-gray-800 transition">Desserts</button>
+                <button onclick="selectCategory('drinks')" class="cat-pill px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap bg-vento-card text-gray-300 hover:text-white border border-gray-800 transition">Beverages & Coffee</button>
+            </div>
+        </div>
+
+        <!-- Menu Items Grid -->
+        <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <!-- Menu Cards inserted dynamically via JavaScript -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-900 bg-black/60 pt-8 pb-6 px-4 mt-12">
+        <div class="max-w-6xl mx-auto text-center space-y-4">
+            <div class="font-serif text-xl font-bold gold-gradient-text">VENTO RESTAURANT</div>
+            <p class="text-xs text-gray-500 max-w-md mx-auto">Providing culinary excellence and fine dining hospitality. Visit us daily for fresh handcrafted meals.</p>
+            <div class="text-[11px] text-gray-600">
+                &copy; <span id="year"></span> Vento Restaurant. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Admin Access Login Modal -->
+    <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-vento-card border border-vento-gold/30 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-vento-gold/10 text-vento-gold border border-vento-gold/30 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h3 class="font-serif text-xl font-bold text-white">Owner Admin Access</h3>
+                <p class="text-xs text-gray-400 mt-1">Enter password to edit menu items, change prices, or update Wi-Fi details.</p>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Admin Password</label>
+                    <input type="password" id="admin-pass-input" placeholder="Enter admin password (Default: 1234)" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-vento-gold">
+                    <p id="login-error" class="text-red-500 text-xs mt-1 hidden"><i class="fa-solid fa-triangle-exclamation"></i> Incorrect password. Default password is 1234.</p>
+                </div>
+                <button type="submit" class="w-full bg-vento-gold text-vento-dark font-bold py-2.5 rounded-lg hover:bg-yellow-400 transition text-sm">
+                    Log In to Control Panel
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Control Panel Modal -->
+    <div id="panel-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden overflow-y-auto">
+        <div class="bg-vento-card border border-vento-gold/40 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative my-8">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-4 mb-6">
+                <div>
+                    <h3 class="font-serif text-xl font-bold gold-gradient-text">Vento Admin Control Panel</h3>
+                    <p class="text-xs text-gray-400">Manage your menu, prices, and customer Wi-Fi settings</p>
+                </div>
+                <button onclick="closePanelModal()" class="text-gray-400 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="flex gap-2 border-b border-gray-800 mb-6 pb-2">
+                <button onclick="switchAdminTab('add')" id="tab-add" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-vento-gold text-vento-dark">Add New Dish</button>
+                <button onclick="switchAdminTab('wifi')" id="tab-wifi" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-gray-300">Wi-Fi Settings</button>
+                <button onclick="switchAdminTab('security')" id="tab-security" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-gray-300">Admin Password</button>
+            </div>
+
+            <!-- Tab 1: Add New Dish Form -->
+            <div id="section-add-dish" class="space-y-4">
+                <h4 class="text-sm font-bold text-white mb-2">Add New Menu Item</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Dish Name *</label>
+                        <input type="text" id="new-item-title" placeholder="e.g. Grilled Salmon" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Price ($) *</label>
+                        <input type="number" step="0.01" id="new-item-price" placeholder="e.g. 24.50" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Category *</label>
+                        <select id="new-item-category" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            <option value="starters">Starters & Appetizers</option>
+                            <option value="mains">Main Courses</option>
+                            <option value="specials">Chef Specials</option>
+                            <option value="desserts">Desserts</option>
+                            <option value="drinks">Beverages & Coffee</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Image URL</label>
+                        <input type="text" id="new-item-image" placeholder="https://images.unsplash.com/..." class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Description</label>
+                    <textarea id="new-item-desc" rows="2" placeholder="Brief details about ingredients or preparation..." class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
+                </div>
+                <button onclick="addNewDish()" class="w-full bg-vento-gold text-vento-dark font-bold py-2 rounded-lg text-xs hover:bg-yellow-400 transition">
+                    + Add Item to Menu
+                </button>
+            </div>
+
+            <!-- Tab 2: Wi-Fi Settings -->
+            <div id="section-wifi" class="space-y-4 hidden">
+                <h4 class="text-sm font-bold text-white mb-2">Update Customer Wi-Fi Credentials</h4>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Wi-Fi Network Name (SSID)</label>
+                    <input type="text" id="edit-wifi-ssid" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Wi-Fi Password</label>
+                    <input type="text" id="edit-wifi-pass" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                </div>
+                <button onclick="saveWifiSettings()" class="w-full bg-vento-gold text-vento-dark font-bold py-2 rounded-lg text-xs hover:bg-yellow-400 transition">
+                    Save Wi-Fi Changes
+                </button>
+            </div>
+
+            <!-- Tab 3: Password Settings -->
+            <div id="section-security" class="space-y-4 hidden">
+                <h4 class="text-sm font-bold text-white mb-2">Change Admin Password</h4>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">New Admin Password</label>
+                    <input type="password" id="new-admin-pass" placeholder="Enter new password" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                </div>
+                <button onclick="changeAdminPassword()" class="w-full bg-vento-gold text-vento-dark font-bold py-2 rounded-lg text-xs hover:bg-yellow-400 transition">
+                    Update Password
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Item Modal -->
+    <div id="edit-dish-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-vento-card border border-vento-gold/30 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="font-serif text-lg font-bold text-white mb-4">Edit Menu Dish</h3>
+            <input type="hidden" id="edit-dish-id">
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Dish Name</label>
+                    <input type="text" id="edit-dish-title" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Price ($)</label>
+                    <input type="number" step="0.01" id="edit-dish-price" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-xs text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Description</label>
+                    <textarea id="edit-dish-desc" rows="3" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
+                </div>
+                <button onclick="saveDishEdit()" class="w-full bg-vento-gold text-vento-dark font-bold py-2 rounded-lg text-xs hover:bg-yellow-400 transition">
+                    Save Dish Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const defaultMenu = [
+            {
+                id: '1',
+                title: 'Truffle Mushroom Bruschetta',
+                category: 'starters',
+                price: 14.50,
+                desc: 'Toasted artisan sourdough, wild forest mushrooms, black truffle glaze, and shaved parmesan cheese.',
+                image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&w=600&q=80',
+                badge: 'Vegetarian'
+            },
+            {
+                id: '2',
+                title: 'Crispy Calamari Fritti',
+                category: 'starters',
+                price: 16.00,
+                desc: 'Tender squid rings lightly dusted in seasoned flour, served with lemon garlic aioli and spicy marinara.',
+                image: 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=600&q=80',
+                badge: 'Chef Choice'
+            },
+            {
+                id: '3',
+                title: 'Prime Ribeye Steak (12oz)',
+                category: 'mains',
+                price: 38.00,
+                desc: 'USDA Prime dry-aged ribeye steak served with rosemary compound butter, roasted garlic, and truffle fries.',
+                image: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=600&q=80',
+                badge: 'Signature'
+            },
+            {
+                id: '4',
+                title: 'Pan-Seared Chilean Sea Bass',
+                category: 'specials',
+                price: 42.00,
+                desc: 'Served over saffron risotto, braised baby spinach, and citrus beurre blanc sauce.',
+                image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80',
+                badge: 'Special'
+            },
+            {
+                id: '5',
+                title: 'Artisanal Wood-Fired Margherita',
+                category: 'mains',
+                price: 19.50,
+                desc: 'San Marzano tomato sauce, fresh buffalo mozzarella, aromatic basil leaves, and extra virgin olive oil.',
+                image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=600&q=80',
+                badge: 'Vegetarian'
+            },
+            {
+                id: '6',
+                title: 'Decadent Lava Chocolate Cake',
+                category: 'desserts',
+                price: 12.00,
+                desc: 'Warm molten dark chocolate center, paired with Madagascar vanilla bean gelato and fresh berries.',
+                image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80',
+                badge: 'Sweet'
+            },
+            {
+                id: '7',
+                title: 'Signature Espresso Martini',
+                category: 'drinks',
+                price: 15.00,
+                desc: 'Freshly brewed Vento espresso, premium vodka, Kahlúa liqueur, lightly sweetened.',
+                image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=600&q=80',
+                badge: 'Cocktail'
+            }
+        ];
+
+        let menuItems = [];
+        let currentCategory = 'all';
+        let isAdminLoggedIn = false;
+        let adminPassword = localStorage.getItem('vento_admin_pass') || '1234';
+        let wifiSettings = JSON.parse(localStorage.getItem('vento_wifi')) || { ssid: 'Vento_Guest_WiFi', pass: 'TastyBites2026' };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('year').textContent = new Date().getFullYear();
+            loadMenuData();
+            renderMenu();
+            updateWifiDisplay();
+        });
+
+        function loadMenuData() {
+            const storedMenu = localStorage.getItem('vento_menu_items');
+            if (storedMenu) {
+                try {
+                    menuItems = JSON.parse(storedMenu);
+                } catch (e) {
+                    menuItems = defaultMenu;
+                }
+            } else {
+                menuItems = defaultMenu;
+                saveMenuToStorage();
+            }
+        }
+
+        function saveMenuToStorage() {
+            localStorage.setItem('vento_menu_items', JSON.stringify(menuItems));
+        }
+
+        function renderMenu() {
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = '';
+
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+            const filtered = menuItems.filter(item => {
+                const matchesCat = currentCategory === 'all' || item.category === currentCategory;
+                const matchesSearch = item.title.toLowerCase().includes(searchTerm) || item.desc.toLowerCase().includes(searchTerm);
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-500">
+                        <i class="fa-solid fa-utensils text-4xl mb-3 opacity-30"></i>
+                        <p class="text-sm">No menu items found in this category.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-vento-card border border-gray-800 rounded-2xl overflow-hidden hover:border-vento-gold/50 transition duration-300 flex flex-col justify-between group shadow-lg relative";
+
+                card.innerHTML = `
+                    <div>
+                        <div class="relative h-48 overflow-hidden bg-gray-900">
+                            <img src="${item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            ${item.badge ? `<span class="absolute top-3 left-3 bg-black/70 backdrop-blur-md text-vento-gold border border-vento-gold/30 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">${item.badge}</span>` : ''}
+                            
+                            ${isAdminLoggedIn ? `
+                                <div class="absolute top-3 right-3 flex gap-1">
+                                    <button onclick="openEditModal('${item.id}')" class="w-8 h-8 rounded-full bg-vento-gold text-vento-dark flex items-center justify-center text-xs font-bold shadow-lg hover:bg-yellow-400">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </button>
+                                    <button onclick="deleteMenuItem('${item.id}')" class="w-8 h-8 rounded-full bg-vento-red text-white flex items-center justify-center text-xs font-bold shadow-lg hover:bg-red-600">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-serif font-bold text-lg text-white group-hover:text-vento-gold transition">${item.title}</h4>
+                                <span class="font-serif font-bold text-vento-gold text-lg">$${parseFloat(item.price).toFixed(2)}</span>
+                            </div>
+                            <p class="text-xs text-gray-400 leading-relaxed">${item.desc}</p>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function selectCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-pill').forEach(btn => {
+                btn.classList.remove('bg-vento-gold', 'text-vento-dark', 'active');
+                btn.classList.add('bg-vento-card', 'text-gray-300');
+            });
+
+            event.target.classList.remove('bg-vento-card', 'text-gray-300');
+            event.target.classList.add('bg-vento-gold', 'text-vento-dark', 'active');
+
+            renderMenu();
+        }
+
+        function filterMenu() {
+            renderMenu();
+        }
+
+        function updateWifiDisplay() {
+            document.getElementById('wifi-ssid-display').textContent = wifiSettings.ssid;
+            document.getElementById('wifi-pass-display').textContent = wifiSettings.pass;
+
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            
+            const wifiString = `WIFI:S:${wifiSettings.ssid};T:WPA;P:${wifiSettings.pass};;`;
+            
+            new QRCode(qrContainer, {
+                text: wifiString,
+                width: 70,
+                height: 70,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+
+        function copyWifiPassword() {
+            navigator.clipboard.writeText(wifiSettings.pass);
+            alert('Wi-Fi Password copied to clipboard: ' + wifiSettings.pass);
+        }
+
+        function openAdminModal() {
+            if (isAdminLoggedIn) {
+                openPanelModal();
+            } else {
+                document.getElementById('admin-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.add('hidden');
+            document.getElementById('login-error').classList.add('hidden');
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const input = document.getElementById('admin-pass-input').value;
+            if (input === adminPassword) {
+                isAdminLoggedIn = true;
+                closeAdminModal();
+                openPanelModal();
+                renderMenu();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function openPanelModal() {
+            document.getElementById('edit-wifi-ssid').value = wifiSettings.ssid;
+            document.getElementById('edit-wifi-pass').value = wifiSettings.pass;
+            document.getElementById('panel-modal').classList.remove('hidden');
+        }
+
+        function closePanelModal() {
+            document.getElementById('panel-modal').classList.add('hidden');
+        }
+
+        function switchAdminTab(tab) {
+            document.getElementById('section-add-dish').classList.add('hidden');
+            document.getElementById('section-wifi').classList.add('hidden');
+            document.getElementById('section-security').classList.add('hidden');
+
+            document.getElementById('tab-add').className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-gray-300";
+            document.getElementById('tab-wifi').className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-gray-300";
+            document.getElementById('tab-security').className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-gray-300";
+
+            if (tab === 'add') {
+                document.getElementById('section-add-dish').classList.remove('hidden');
+                document.getElementById('tab-add').className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-vento-gold text-vento-dark";
+            } else if (tab === 'wifi') {
+                document.getElementById('section-wifi').classList.remove('hidden');
+                document.getElementById('tab-wifi').className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-vento-gold text-vento-dark";
+            } else if (tab === 'security') {
+                document.getElementById('section-security').classList.remove('hidden');
+                document.getElementById('tab-security').className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-vento-gold text-vento-dark";
+            }
+        }
+
+        function addNewDish() {
+            const title = document.getElementById('new-item-title').value;
+            const price = parseFloat(document.getElementById('new-item-price').value);
+            const category = document.getElementById('new-item-category').value;
+            const image = document.getElementById('new-item-image').value;
+            const desc = document.getElementById('new-item-desc').value;
+
+            if (!title || isNaN(price)) {
+                alert('Please enter a valid title and price.');
+                return;
+            }
+
+            const newItem = {
+                id: Date.now().toString(),
+                title,
+                price,
+                category,
+                image: image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+                desc: desc || 'Delicious dish freshly prepared at Vento.',
+                badge: 'New'
+            };
+
+            menuItems.unshift(newItem);
+            saveMenuToStorage();
+            renderMenu();
+
+            document.getElementById('new-item-title').value = '';
+            document.getElementById('new-item-price').value = '';
+            document.getElementById('new-item-image').value = '';
+            document.getElementById('new-item-desc').value = '';
+
+            alert('Dish added successfully!');
+        }
+
+        function deleteMenuItem(id) {
+            if (confirm('Are you sure you want to delete this dish from the menu?')) {
+                menuItems = menuItems.filter(item => item.id !== id);
+                saveMenuToStorage();
+                renderMenu();
+            }
+        }
+
+        function openEditModal(id) {
+            const item = menuItems.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById('edit-dish-id').value = item.id;
+            document.getElementById('edit-dish-title').value = item.title;
+            document.getElementById('edit-dish-price').value = item.price;
+            document.getElementById('edit-dish-desc').value = item.desc;
+
+            document.getElementById('edit-dish-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-dish-modal').classList.add('hidden');
+        }
+
+        function saveDishEdit() {
+            const id = document.getElementById('edit-dish-id').value;
+            const item = menuItems.find(i => i.id === id);
+
+            if (item) {
+                item.title = document.getElementById('edit-dish-title').value;
+                item.price = parseFloat(document.getElementById('edit-dish-price').value) || item.price;
+                item.desc = document.getElementById('edit-dish-desc').value;
+
+                saveMenuToStorage();
+                renderMenu();
+                closeEditModal();
+            }
+        }
+
+        function saveWifiSettings() {
+            const ssid = document.getElementById('edit-wifi-ssid').value;
+            const pass = document.getElementById('edit-wifi-pass').value;
+
+            if (ssid && pass) {
+                wifiSettings = { ssid, pass };
+                localStorage.setItem('vento_wifi', JSON.stringify(wifiSettings));
+                updateWifiDisplay();
+                alert('Wi-Fi credentials updated successfully!');
+            }
+        }
+
+        function changeAdminPassword() {
+            const newPass = document.getElementById('new-admin-pass').value;
+            if (newPass) {
+                adminPassword = newPass;
+                localStorage.setItem('vento_admin_pass', newPass);
+                alert('Admin Password updated successfully!');
+                document.getElementById('new-admin-pass').value = '';
+            }
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
